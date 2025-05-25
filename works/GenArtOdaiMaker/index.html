@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative Art Prompt Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for Twitter icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Generative Art Prompt Generator</h1>
+        <div class="prompt-container">
+            <div class="section">
+                <h2>カラーパレット</h2>
+                <div class="color-palette" id="colorPalette">
+                    <div class="color-box" id="color1"></div>
+                    <div class="color-box" id="color2"></div>
+                    <div class="color-box" id="color3"></div>
+                    <div class="color-box" id="color4"></div>
+                    <div class="color-box" id="color5"></div>
+                </div>
+                <div class="color-codes" id="colorCodes"></div>
+                <button id="generateColors">新しいパレット</button>
+            </div>
+            
+            <div class="section">
+                <h2>テーマワード</h2>
+                <div class="theme-words" id="themeWords">
+                    <div class="word-box">ワード 1</div>
+                    <div class="word-box">ワード 2</div>
+                    <div class="word-box">ワード 3</div>
+                </div>
+                <button id="generateWords">新しいワード</button>
+            </div>
+            
+            <div class="section">
+                <h2>制限時間</h2>
+                <div class="time-selector">
+                    <input type="number" id="hours" min="0" max="24" value="1">
+                    <label for="hours">時間</label>
+                    <input type="number" id="minutes" min="0" max="59" value="0">
+                    <label for="minutes">分</label>
+                    <button id="randomTime" class="small-button">ランダム</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="generateAll" class="primary-button">すべて生成</button>
+            <button id="copyPrompt">プロンプトをコピー</button>
+            <button id="tweetPrompt" class="twitter-button"><i class="fab fa-twitter"></i> Xでシェア</button>
+        </div>
+        
+        <div class="prompt-result" id="promptResult">
+            <h3>生成されたプロンプト</h3>
+            <p id="finalPrompt"></p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
