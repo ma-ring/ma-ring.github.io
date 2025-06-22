@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>福笑いゲーム</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="sketch.js"></script>
+  <style>
+    body {
+      font-family: 'M PLUS Rounded 1c', 'Nunito', Arial, sans-serif;
+      background: linear-gradient(135deg, #fff7fb 0%, #e0f7fa 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    h1 {
+      color: #ff93b3;
+      font-size: 2.3rem;
+      margin-top: 36px;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.05em;
+      text-shadow: 1px 2px 6px #fff5fa, 0 1px 0 #fff;
+    }
+    p {
+      color: #6d6d6d;
+      font-size: 1.1rem;
+      background: #fff5fa;
+      display: inline-block;
+      padding: 0.7em 1.3em;
+      border-radius: 1.5em;
+      margin-bottom: 1.2em;
+      box-shadow: 0 2px 12px #ffe1ed70;
+    }
+    .button-group {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    button {
+      font-family: inherit;
+      font-size: 1.05rem;
+      background: linear-gradient(90deg,#ffd6e0 0%,#b2ebf2 100%);
+      color: #ff4081;
+      border: none;
+      border-radius: 2em;
+      box-shadow: 0 2px 8px #f8bbd0a0;
+      padding: 0.7em 2.2em;
+      margin: 0 2px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      outline: none;
+    }
+    button:active {
+      background: linear-gradient(90deg,#b2ebf2 0%,#ffd6e0 100%);
+      box-shadow: 0 1px 3px #b2ebf2a0;
+      transform: scale(0.97);
+    }
+    #defaultCanvas0, canvas {
+      border-radius: 24px;
+      box-shadow: 0 6px 32px #b2ebf2a0, 0 1.5px 0 #fff;
+      margin-top: 24px;
+      background: #fff;
+      max-width: 96vw;
+      height: auto !important;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.3rem; }
+      p { font-size: 0.95rem; }
+      button { font-size: 0.9rem; padding: 0.7em 1.2em; }
+    }
+  </style>
+</head>
+<body>
+  <h1>ミャクミャク様福笑い</h1>
+  <p>パーツをドラッグしてミャクミャク様を完成させよう<br>終わったら回答ボタンを押してね！</p>
+
+  <div class="button-group">
+    <button id="hintBtn">ヒント</button>
+    <button id="answerBtn">回答</button>
+    <button id="resetBtn">リセット</button>
+  </div>
+</body>
+</html>
