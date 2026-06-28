@@ -1,78 +1,3 @@
-const missions = [
-  {
-    category: "COLOR",
-    icon: "🔵",
-    text: "青いものを5つ探そう",
-    hint: "空、看板、服、影。意識すると急に青が見えてくる。"
-  },
-  {
-    category: "COLOR",
-    icon: "🔴",
-    text: "赤いものを3つ見つけよう",
-    hint: "小さな赤ほど、見つけるとうれしい。"
-  },
-  {
-    category: "SHAPE",
-    icon: "⚪",
-    text: "丸いものだけを撮ろう",
-    hint: "標識、皿、ライト、マンホール。街は意外と丸い。"
-  },
-  {
-    category: "LIGHT",
-    icon: "✨",
-    text: "光がきれいな場所を探そう",
-    hint: "反射、木漏れ日、窓辺。光の通り道を見る。"
-  },
-  {
-    category: "SHADOW",
-    icon: "🌗",
-    text: "影だけを主役にして撮ろう",
-    hint: "本体ではなく、影の形を見てみる。"
-  },
-  {
-    category: "TEXTURE",
-    icon: "🪨",
-    text: "ざらざらしたものを探そう",
-    hint: "壁、道、木、布。触感を写真にするつもりで。"
-  },
-  {
-    category: "ANGLE",
-    icon: "👟",
-    text: "足元だけを見て歩こう",
-    hint: "普段見逃している小さな世界がある。"
-  },
-  {
-    category: "ANGLE",
-    icon: "🕊️",
-    text: "真上を見上げて撮ろう",
-    hint: "空、天井、電線、枝。視線を上にずらす。"
-  },
-  {
-    category: "STORY",
-    icon: "🌿",
-    text: "今日一番静かな場所を撮ろう",
-    hint: "音が少ない場所、時間が止まったような場所。"
-  },
-  {
-    category: "STORY",
-    icon: "🍬",
-    text: "今日一番かわいいものを探そう",
-    hint: "人に説明できない“かわいい”でもOK。"
-  },
-  {
-    category: "SEASON",
-    icon: "🍉",
-    text: "夏を感じるものを撮ろう",
-    hint: "温度、色、湿度、匂いまで想像できるもの。"
-  },
-  {
-    category: "RULE",
-    icon: "3",
-    text: "3枚だけ撮って終わりにしよう",
-    hint: "制限があると、選ぶ目が少し鋭くなる。"
-  }
-];
-
 const categoryEl = document.getElementById("category");
 const iconEl = document.getElementById("icon");
 const missionTextEl = document.getElementById("missionText");
@@ -82,19 +7,67 @@ const newMissionBtn = document.getElementById("newMission");
 const copyMissionBtn = document.getElementById("copyMission");
 const shareMissionBtn = document.getElementById("shareMission");
 
-let currentMission = missions[0];
+let missions = [];
+let currentMission = null;
+
+function renderMission(mission) {
+  categoryEl.textContent = mission.category;
+  iconEl.textContent = mission.icon;
+  missionTextEl.textContent = mission.text;
+  hintEl.textContent = mission.hint;
+}
+
+function setLoadingState(isLoading) {
+  newMissionBtn.disabled = isLoading;
+  copyMissionBtn.disabled = isLoading;
+  shareMissionBtn.disabled = isLoading;
+}
+
+function getMissionUrl(mission) {
+  const url = new URL(window.location.href);
+
+  if (mission?.id) {
+    url.searchParams.set("id", mission.id);
+  } else {
+    url.searchParams.delete("id");
+  }
+
+  return url.toString();
+}
+
+function syncMissionUrl(mission) {
+  window.history.replaceState({}, "", getMissionUrl(mission));
+}
+
+function findMissionById(id) {
+  return missions.find((mission) => mission.id === id) || null;
+}
+
+function getRequestedMissionId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+function setCurrentMission(mission) {
+  currentMission = mission;
+  renderMission(currentMission);
+  syncMissionUrl(currentMission);
+}
 
 function pickMission() {
-  const index = Math.floor(Math.random() * missions.length);
-  currentMission = missions[index];
+  if (missions.length === 0) {
+    return;
+  }
 
-  categoryEl.textContent = currentMission.category;
-  iconEl.textContent = currentMission.icon;
-  missionTextEl.textContent = currentMission.text;
-  hintEl.textContent = currentMission.hint;
+  const index = Math.floor(Math.random() * missions.length);
+  setCurrentMission(missions[index]);
 }
 
 function getShareText() {
+  if (!currentMission) {
+    return "PHOTO MISSION\n\nお題を読み込み中です。";
+  }
+
   return `PHOTO MISSION\n\n${currentMission.text}\n\nいつもの景色を、違う見方で。\n#PhotoMission #MAHOLAB`;
 }
 
@@ -114,12 +87,47 @@ async function copyMission() {
 
 function shareMission() {
   const text = encodeURIComponent(getShareText());
-  const url = encodeURIComponent(location.href);
+  const url = encodeURIComponent(getMissionUrl(currentMission));
   window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+}
+
+async function loadMissions() {
+  setLoadingState(true);
+
+  try {
+    const response = await fetch("./missions.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to load missions: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("Mission data is empty.");
+    }
+
+    missions = data;
+
+    const requestedId = getRequestedMissionId();
+    const requestedMission = requestedId ? findMissionById(requestedId) : null;
+
+    if (requestedMission) {
+      setCurrentMission(requestedMission);
+    } else {
+      pickMission();
+    }
+  } catch (error) {
+    console.error(error);
+    categoryEl.textContent = "ERROR";
+    iconEl.textContent = "!";
+    missionTextEl.textContent = "お題の読み込みに失敗しました";
+    hintEl.textContent = "missions.json を確認してください。";
+  } finally {
+    setLoadingState(false);
+  }
 }
 
 newMissionBtn.addEventListener("click", pickMission);
 copyMissionBtn.addEventListener("click", copyMission);
 shareMissionBtn.addEventListener("click", shareMission);
 
-pickMission();
+loadMissions();

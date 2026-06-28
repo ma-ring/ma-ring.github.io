@@ -1,0 +1,86 @@
+[
+  {
+    "id": "blue-five",
+    "category": "COLOR",
+    "icon": "🔵",
+    "text": "青いものを5つ探そう",
+    "hint": "空、看板、服、影。意識すると急に青が見えてくる。"
+  },
+  {
+    "id": "red-three",
+    "category": "COLOR",
+    "icon": "🔴",
+    "text": "赤いものを3つ見つけよう",
+    "hint": "小さな赤ほど、見つけるとうれしい。"
+  },
+  {
+    "id": "circle-only",
+    "category": "SHAPE",
+    "icon": "⚪",
+    "text": "丸いものだけを撮ろう",
+    "hint": "標識、皿、ライト、マンホール。街は意外と丸い。"
+  },
+  {
+    "id": "beautiful-light",
+    "category": "LIGHT",
+    "icon": "✨",
+    "text": "光がきれいな場所を探そう",
+    "hint": "反射、木漏れ日、窓辺。光の通り道を見る。"
+  },
+  {
+    "id": "shadow-main",
+    "category": "SHADOW",
+    "icon": "🌗",
+    "text": "影だけを主役にして撮ろう",
+    "hint": "本体ではなく、影の形を見てみる。"
+  },
+  {
+    "id": "rough-texture",
+    "category": "TEXTURE",
+    "icon": "🪨",
+    "text": "ざらざらしたものを探そう",
+    "hint": "壁、道、木、布。触感を写真にするつもりで。"
+  },
+  {
+    "id": "look-down",
+    "category": "ANGLE",
+    "icon": "👟",
+    "text": "足元だけを見て歩こう",
+    "hint": "普段見逃している小さな世界がある。"
+  },
+  {
+    "id": "look-up",
+    "category": "ANGLE",
+    "icon": "🕊️",
+    "text": "真上を見上げて撮ろう",
+    "hint": "空、天井、電線、枝。視線を上にずらす。"
+  },
+  {
+    "id": "quiet-place",
+    "category": "STORY",
+    "icon": "🌿",
+    "text": "今日一番静かな場所を撮ろう",
+    "hint": "音が少ない場所、時間が止まったような場所。"
+  },
+  {
+    "id": "cute-today",
+    "category": "STORY",
+    "icon": "🍬",
+    "text": "今日一番かわいいものを探そう",
+    "hint": "人に説明できない“かわいい”でもOK。"
+  },
+  {
+    "id": "feel-summer",
+    "category": "SEASON",
+    "icon": "🍉",
+    "text": "夏を感じるものを撮ろう",
+    "hint": "温度、色、湿度、匂いまで想像できるもの。"
+  },
+  {
+    "id": "three-shots",
+    "category": "RULE",
+    "icon": "3",
+    "text": "3枚だけ撮って終わりにしよう",
+    "hint": "制限があると、選ぶ目が少し鋭くなる。"
+  }
+]
