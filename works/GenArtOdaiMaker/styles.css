@@ -209,3 +209,25 @@ button:hover {
         gap: 0.8rem;
     }
 }
+
+.app-intro {
+  margin: 20px auto 32px;
+  max-width: 720px;
+  text-align: center;
+}
+
+.app-intro .lead {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #555;
+}
+
+.how-to-use {
+  gap: 10px;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+

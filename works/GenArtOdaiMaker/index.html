@@ -11,6 +11,21 @@
 <body>
     <div class="container">
         <h1>Generative Art Prompt Generator</h1>
+
+        <div class="app-intro">
+        <p class="lead">
+            ジェネラティブアート制作のための「色・言葉・制限時間」をランダムに作るお題メーカーです。
+        </p>
+
+        <ol class="how-to-use">
+            <li>Step1.「生成」ボタンでお題を作る</li>
+            <li>Step2. 色やテーマワードを見ながら作品を作る</li>
+            <li>Step3. できたお題をコピーしたり、Xでシェアする</li>
+        </ol>
+        </div>
+        <div class="action-buttons">
+            <button id="generateAll">生成</button>
+        </div>
         <div class="prompt-container">
             <div class="section">
                 <h2>カラーパレット</h2>
@@ -48,7 +63,6 @@
         </div>
         
         <div class="action-buttons">
-            <button id="generateAll" class="primary-button">すべて生成</button>
             <button id="copyPrompt">プロンプトをコピー</button>
             <button id="tweetPrompt" class="twitter-button"><i class="fab fa-twitter"></i> Xでシェア</button>
         </div>
@@ -58,7 +72,9 @@
             <p id="finalPrompt"></p>
         </div>
     </div>
-    
+    <footer>
+        <p>© MAHOO LAB</p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>
