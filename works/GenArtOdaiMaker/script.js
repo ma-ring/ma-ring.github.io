@@ -299,8 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shareOnX() {
-        const promptText = `${finalPromptEl.textContent}\n\n#GenArtOdaiMaker #MAHOLAB #generativeart`;
-        const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(promptText)}`;
+        const promptText = `${finalPromptEl.textContent}\n\n#GenArtOdaiMaker #generativeart`;
+        const shareUrl = encodeURIComponent(window.location.href);
+        const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(promptText)}&url=${shareUrl}`;
         window.open(xUrl, '_blank', 'noopener');
     }
 
