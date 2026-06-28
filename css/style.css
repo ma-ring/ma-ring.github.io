@@ -415,3 +415,10 @@ a {
     gap: 8px;
   }
 }
+
+
+.thumb {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

@@ -1,338 +1,336 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
     const colorBoxes = document.querySelectorAll('.color-box');
     const colorCodesDiv = document.getElementById('colorCodes');
-    const themeWordsDiv = document.getElementById('themeWords');
     const wordBoxes = document.querySelectorAll('.word-box');
     const hoursInput = document.getElementById('hours');
     const minutesInput = document.getElementById('minutes');
+    const constraintValueEl = document.getElementById('constraintValue');
+    const seedDisplayEl = document.getElementById('seedDisplay');
+    const finalPromptEl = document.getElementById('finalPrompt');
+
     const randomTimeBtn = document.getElementById('randomTime');
     const generateColorsBtn = document.getElementById('generateColors');
     const generateWordsBtn = document.getElementById('generateWords');
+    const generateConstraintBtn = document.getElementById('generateConstraint');
     const generateAllBtn = document.getElementById('generateAll');
     const copyPromptBtn = document.getElementById('copyPrompt');
     const tweetPromptBtn = document.getElementById('tweetPrompt');
-    const finalPromptEl = document.getElementById('finalPrompt');
 
-    // Theme word lists
     const themeWordCategories = {
         concepts: [
-            '自然', '都市', '宇宙', '海', '山', '森', '夢', '記憶', '感情', '時間', 
-            '光', '闇', '静寂', '騒音', '混沌', '秩序', '生命', '死', '愛', '憎しみ', 
+            '自然', '都市', '宇宙', '海', '山', '森', '夢', '記憶', '感情', '時間',
+            '光', '闇', '静寂', '騒音', '混沌', '秩序', '生命', '死', '愛', '憎しみ',
             '平和', '戦争', '過去', '未来', '現在', '瞬間', '永遠', '変化', '静止', '動き',
             'サイバー', 'オーガニック', 'メカニカル', 'フラクタル', 'ミニマル', 'マキシマル'
         ],
         adjectives: [
-            '明るい', '暗い', '鮮やかな', '淡い', '透明な', '不透明な', '柔らかい', '硬い', 
-            '流れる', '止まる', '複雑な', '単純な', '古い', '新しい', '冷たい', '熱い', 
-            '乾いた', '湿った', '重い', '軽い', '鋭い', '鈍い', '滑らかな', '粗い', 
+            '明るい', '暗い', '鮮やかな', '淡い', '透明な', '不透明な', '柔らかい', '硬い',
+            '流れる', '止まる', '複雑な', '単純な', '古い', '新しい', '冷たい', '熱い',
+            '乾いた', '湿った', '重い', '軽い', '鋭い', '鈍い', '滑らかな', '粗い',
             '対称的な', '非対称な', '規則的な', '不規則な', '幾何学的な', '有機的な',
             'デジタルな', 'アナログな', 'グリッチした', 'ノスタルジックな', 'フューチャリスティックな'
         ],
         techniques: [
-            'ピクセルアート', 'ベクターアート', '水彩画', '油絵', 'コラージュ', 'モザイク', 
-            'ドット絵', '線画', '点描', 'グラデーション', 'パターン', 'テクスチャ', 
-            '3Dモデリング', 'アニメーション', 'シルエット', 'スケッチ', 'マンダラ', 
-            'グラフィティ', 'タイポグラフィ', 'カリグラフィ', 'スクラッチアート', 
+            'ピクセルアート', 'ベクターアート', '水彩画', '油絵', 'コラージュ', 'モザイク',
+            'ドット絵', '線画', '点描', 'グラデーション', 'パターン', 'テクスチャ',
+            '3Dモデリング', 'アニメーション', 'シルエット', 'スケッチ', 'マンダラ',
+            'グラフィティ', 'タイポグラフィ', 'カリグラフィ', 'スクラッチアート',
             'ジェネラティブアート', 'フラクタルアート', 'グリッチアート', 'ニューラルアート',
             'プロシージャル', 'パーティクル', 'ボロノイ', 'セルオートマトン', 'L-システム'
         ]
     };
 
-    // Generate random color in hex format
+    const constraints = [
+        '円だけで描く',
+        '線だけで描く',
+        '左右対称にする',
+        '1色だけ使う',
+        'マウス入力を使う',
+        'ランダム性を入れる',
+        'ノイズを使わない',
+        '画面の半分だけ使う',
+        '100個以内の図形で描く',
+        '15分以内でラフを作る',
+        '文字を1つだけ入れる',
+        '背景を塗りつぶさない',
+        '余白を必ず残す',
+        '同じ形を反復する',
+        '直線と曲線を両方入れる'
+    ];
+
+    let currentSeed = null;
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 6; i += 1) {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
     }
 
-    // Generate harmonious color palette
-    function generateColorPalette() {
-        // Generate base color
-        const baseColor = getRandomColor();
-        const baseHsl = hexToHSL(baseColor);
-        
-        // Generate palette based on color theory
-        const palette = [];
-        
-        // Add base color
-        palette.push(baseColor);
-        
-        // Add complementary color (opposite on color wheel)
-        const complementaryHue = (baseHsl.h + 180) % 360;
-        palette.push(hslToHex(complementaryHue, baseHsl.s, baseHsl.l));
-        
-        // Add analogous color (adjacent on color wheel)
-        const analogousHue1 = (baseHsl.h + 30) % 360;
-        palette.push(hslToHex(analogousHue1, baseHsl.s, baseHsl.l));
-        
-        // Add triadic color
-        const triadicHue = (baseHsl.h + 120) % 360;
-        palette.push(hslToHex(triadicHue, baseHsl.s, baseHsl.l));
-        
-        // Add variation with different lightness
-        palette.push(hslToHex(baseHsl.h, baseHsl.s, (baseHsl.l + 30) % 100));
-        
-        return palette;
-    }
-
-    // Convert hex to HSL
     function hexToHSL(hex) {
-        // Remove the # if present
-        hex = hex.replace(/^#/, '');
-        
-        // Parse the hex values
-        const r = parseInt(hex.substring(0, 2), 16) / 255;
-        const g = parseInt(hex.substring(2, 4), 16) / 255;
-        const b = parseInt(hex.substring(4, 6), 16) / 255;
-        
+        const normalizedHex = hex.replace(/^#/, '');
+        const r = parseInt(normalizedHex.substring(0, 2), 16) / 255;
+        const g = parseInt(normalizedHex.substring(2, 4), 16) / 255;
+        const b = parseInt(normalizedHex.substring(4, 6), 16) / 255;
+
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-        
-        if (max === min) {
-            h = s = 0; // achromatic
-        } else {
+        let h = 0;
+        let s = 0;
+        const l = (max + min) / 2;
+
+        if (max !== min) {
             const d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            
+
             switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                default:
+                    h = (r - g) / d + 4;
+                    break;
             }
-            
+
             h = Math.round(h * 60);
         }
-        
-        s = Math.round(s * 100);
-        l = Math.round(l * 100);
-        
-        return { h, s, l };
+
+        return {
+            h,
+            s: Math.round(s * 100),
+            l: Math.round(l * 100)
+        };
     }
 
-    // Convert HSL to hex
     function hslToHex(h, s, l) {
-        h /= 360;
-        s /= 100;
-        l /= 100;
-        
-        let r, g, b;
-        
-        if (s === 0) {
-            r = g = b = l; // achromatic
+        let r;
+        let g;
+        let b;
+
+        const normalizedH = h / 360;
+        const normalizedS = s / 100;
+        const normalizedL = l / 100;
+
+        if (normalizedS === 0) {
+            r = normalizedL;
+            g = normalizedL;
+            b = normalizedL;
         } else {
             const hue2rgb = (p, q, t) => {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                let adjustedT = t;
+                if (adjustedT < 0) adjustedT += 1;
+                if (adjustedT > 1) adjustedT -= 1;
+                if (adjustedT < 1 / 6) return p + (q - p) * 6 * adjustedT;
+                if (adjustedT < 1 / 2) return q;
+                if (adjustedT < 2 / 3) return p + (q - p) * (2 / 3 - adjustedT) * 6;
                 return p;
             };
-            
-            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            const p = 2 * l - q;
-            
-            r = hue2rgb(p, q, h + 1/3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1/3);
+
+            const q = normalizedL < 0.5
+                ? normalizedL * (1 + normalizedS)
+                : normalizedL + normalizedS - normalizedL * normalizedS;
+            const p = 2 * normalizedL - q;
+
+            r = hue2rgb(p, q, normalizedH + 1 / 3);
+            g = hue2rgb(p, q, normalizedH);
+            b = hue2rgb(p, q, normalizedH - 1 / 3);
         }
-        
-        const toHex = x => {
-            const hex = Math.round(x * 255).toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
+
+        const toHex = (value) => {
+            const hex = Math.round(value * 255).toString(16);
+            return hex.length === 1 ? `0${hex}` : hex;
         };
-        
-        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
     }
 
-    // Display color palette
+    function rgbToHex(rgb) {
+        if (!rgb) return '';
+        if (rgb.startsWith('#')) return rgb.toUpperCase();
+
+        const rgbValues = rgb.match(/\d+/g);
+        if (!rgbValues || rgbValues.length < 3) return rgb;
+
+        const [r, g, b] = rgbValues.map(Number);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+    }
+
+    function generateColorPalette() {
+        const baseColor = getRandomColor();
+        const baseHsl = hexToHSL(baseColor);
+        const lightness = Math.min(baseHsl.l + 18, 82);
+
+        return [
+            baseColor,
+            hslToHex((baseHsl.h + 180) % 360, baseHsl.s, baseHsl.l),
+            hslToHex((baseHsl.h + 30) % 360, baseHsl.s, baseHsl.l),
+            hslToHex((baseHsl.h + 120) % 360, baseHsl.s, baseHsl.l),
+            hslToHex(baseHsl.h, Math.max(baseHsl.s - 10, 18), lightness)
+        ];
+    }
+
     function displayColorPalette(palette) {
-        colorBoxes.forEach((box, index) => {
-            box.style.backgroundColor = palette[index];
-        });
-        
-        // Display color codes
         colorCodesDiv.innerHTML = '';
-        palette.forEach(color => {
+
+        colorBoxes.forEach((box, index) => {
+            const color = palette[index];
+            box.style.backgroundColor = color;
+            box.setAttribute('aria-label', `Color ${index + 1}: ${color}`);
+
             const colorCode = document.createElement('span');
-            colorCode.textContent = color.toUpperCase();
+            colorCode.textContent = color;
             colorCodesDiv.appendChild(colorCode);
         });
     }
 
-    // Generate random theme words
     function generateThemeWords() {
-        const words = [];
-        
-        // Get one word from each category
-        words.push(getRandomItem(themeWordCategories.concepts));
-        words.push(getRandomItem(themeWordCategories.adjectives));
-        words.push(getRandomItem(themeWordCategories.techniques));
-        
-        return words;
+        return [
+            getRandomItem(themeWordCategories.concepts),
+            getRandomItem(themeWordCategories.adjectives),
+            getRandomItem(themeWordCategories.techniques)
+        ];
     }
 
-    // Get random item from array
-    function getRandomItem(array) {
-        return array[Math.floor(Math.random() * array.length)];
-    }
-
-    // Display theme words
     function displayThemeWords(words) {
         wordBoxes.forEach((box, index) => {
             box.textContent = words[index];
         });
     }
 
-    // Generate random time
+    function formatTime(hours, minutes) {
+        const safeHours = Number.parseInt(hours, 10) || 0;
+        const safeMinutes = Number.parseInt(minutes, 10) || 0;
+
+        if (safeHours <= 0 && safeMinutes <= 0) {
+            return '指定なし';
+        }
+
+        if (safeHours > 0 && safeMinutes > 0) {
+            return `${safeHours}時間 ${safeMinutes}分`;
+        }
+
+        if (safeHours > 0) {
+            return `${safeHours}時間`;
+        }
+
+        return `${safeMinutes}分`;
+    }
+
     function generateRandomTime() {
-        // Generate random time between 5 minutes and 3 hours
-        const minMinutes = 5;
-        const maxMinutes = 180;
-        
-        let totalMinutes = Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) + minMinutes;
-        
-        // Convert to hours and minutes
+        const totalMinutes = getRandomInt(5, 180);
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        
-        // Update inputs
+
         hoursInput.value = hours;
         minutesInput.value = minutes;
-        
-        // Update final prompt
-        updateFinalPrompt();
     }
 
-    // Generate final prompt
+    function generateConstraint() {
+        return getRandomItem(constraints);
+    }
+
+    function displayConstraint(constraint) {
+        constraintValueEl.textContent = constraint;
+    }
+
+    function getCurrentPalette() {
+        return Array.from(colorBoxes).map((box) => rgbToHex(box.style.backgroundColor));
+    }
+
+    function getCurrentWords() {
+        return Array.from(wordBoxes).map((box) => box.textContent.trim());
+    }
+
+    function generateSeed() {
+        currentSeed = getRandomInt(10000, 99999);
+        seedDisplayEl.textContent = `Seed: #${currentSeed}`;
+    }
+
     function generateFinalPrompt() {
-        const colors = [];
-        colorBoxes.forEach(box => {
-            colors.push(box.style.backgroundColor);
-        });
-        
-        const words = [];
-        wordBoxes.forEach(box => {
-            words.push(box.textContent);
-        });
-        
-        const hours = parseInt(hoursInput.value) || 0;
-        const minutes = parseInt(minutesInput.value) || 0;
-        const totalTime = (hours > 0 ? `${hours}時間` : '') + (minutes > 0 ? `${minutes}分` : '');
-        
-        let promptText = `【Generative Art プロンプト】\n\n`;
-        promptText += `■ カラーパレット:\n`;
-        
-        const colorCodes = [];
-        colorBoxes.forEach(box => {
-            if (box.style.backgroundColor) {
-                const rgb = box.style.backgroundColor;
-                const hex = rgbToHex(rgb);
-                colorCodes.push(hex);
-            }
-        });
-        
-        promptText += colorCodes.join(', ') + '\n\n';
-        promptText += `■ テーマワード:\n${words.join('、')}\n\n`;
-        promptText += `■ 制限時間:\n${totalTime || '指定なし'}`;
-        
-        return promptText;
+        const palette = getCurrentPalette();
+        const words = getCurrentWords();
+        const time = formatTime(hoursInput.value, minutesInput.value);
+        const constraint = constraintValueEl.textContent.trim();
+        const seedLine = currentSeed ? `Seed: #${currentSeed}\n` : '';
+
+        return `${seedLine}Palette: ${palette.join(', ')}\nWords: ${words.join(' / ')}\nTime: ${time}\nConstraint: ${constraint}`;
     }
 
-    // Convert RGB to Hex
-    function rgbToHex(rgb) {
-        // If already in hex format, return as is
-        if (rgb.startsWith('#')) return rgb;
-        
-        // Extract the RGB values
-        const rgbValues = rgb.match(/\d+/g);
-        if (!rgbValues || rgbValues.length < 3) return rgb;
-        
-        const r = parseInt(rgbValues[0]);
-        const g = parseInt(rgbValues[1]);
-        const b = parseInt(rgbValues[2]);
-        
-        // Convert to hex
-        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-    }
-
-    // Share prompt on X
-    function shareOnX() {
-        const promptText = finalPromptEl.textContent;
-        const tweetText = encodeURIComponent(`${promptText}\n\n#GenerativeArt #ジェネラティブアート #創作お題`);
-        const xUrl = `https://x.com/intent/tweet?text=${tweetText}`;
-        
-        // Open X in a new window
-        window.open(xUrl, '_blank');
-    }
-
-    // Initialize the app
-    function init() {
-        // Generate initial color palette
-        const initialPalette = generateColorPalette();
-        displayColorPalette(initialPalette);
-        
-        // Generate initial theme words
-        const initialWords = generateThemeWords();
-        displayThemeWords(initialWords);
-        
-        // Update final prompt
-        updateFinalPrompt();
-    }
-
-    // Update the final prompt
     function updateFinalPrompt() {
-        const promptText = generateFinalPrompt();
-        finalPromptEl.textContent = promptText;
+        finalPromptEl.textContent = generateFinalPrompt();
     }
 
-    // Event Listeners
-    generateColorsBtn.addEventListener('click', () => {
-        const palette = generateColorPalette();
-        displayColorPalette(palette);
+    function refreshPrompt() {
+        generateSeed();
         updateFinalPrompt();
+    }
+
+    function generateAll() {
+        displayColorPalette(generateColorPalette());
+        displayThemeWords(generateThemeWords());
+        generateRandomTime();
+        displayConstraint(generateConstraint());
+        refreshPrompt();
+    }
+
+    async function copyPrompt() {
+        const promptText = finalPromptEl.textContent;
+
+        try {
+            await navigator.clipboard.writeText(`${promptText}\n#GenArtOdaiMaker #MAHOLAB #generativeart`);
+            alert('プロンプトをクリップボードにコピーしました。');
+        } catch (error) {
+            console.error('コピーに失敗しました:', error);
+            alert('コピーに失敗しました。手動でコピーしてください。');
+        }
+    }
+
+    function shareOnX() {
+        const promptText = `${finalPromptEl.textContent}\n\n#GenArtOdaiMaker #MAHOLAB #generativeart`;
+        const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(promptText)}`;
+        window.open(xUrl, '_blank', 'noopener');
+    }
+
+    generateColorsBtn.addEventListener('click', () => {
+        displayColorPalette(generateColorPalette());
+        refreshPrompt();
     });
 
     generateWordsBtn.addEventListener('click', () => {
-        const words = generateThemeWords();
-        displayThemeWords(words);
-        updateFinalPrompt();
+        displayThemeWords(generateThemeWords());
+        refreshPrompt();
     });
 
-    randomTimeBtn.addEventListener('click', generateRandomTime);
-
-    generateAllBtn.addEventListener('click', () => {
-        const palette = generateColorPalette();
-        displayColorPalette(palette);
-        
-        const words = generateThemeWords();
-        displayThemeWords(words);
-        
+    randomTimeBtn.addEventListener('click', () => {
         generateRandomTime();
-        
-        updateFinalPrompt();
+        refreshPrompt();
     });
 
-    copyPromptBtn.addEventListener('click', () => {
-        const promptText = finalPromptEl.textContent;
-        navigator.clipboard.writeText(promptText)
-            .then(() => {
-                alert('プロンプトをクリップボードにコピーしました！');
-            })
-            .catch(err => {
-                console.error('コピーに失敗しました:', err);
-                alert('コピーに失敗しました。手動でコピーしてください。');
-            });
+    generateConstraintBtn.addEventListener('click', () => {
+        displayConstraint(generateConstraint());
+        refreshPrompt();
     });
 
-    // X share button event listener
+    generateAllBtn.addEventListener('click', generateAll);
+    copyPromptBtn.addEventListener('click', copyPrompt);
     tweetPromptBtn.addEventListener('click', shareOnX);
 
-    // Initialize the app
-    init();
+    [hoursInput, minutesInput].forEach((input) => {
+        input.addEventListener('input', updateFinalPrompt);
+    });
+
+    generateAll();
 });

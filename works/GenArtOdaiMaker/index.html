@@ -3,78 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generative Art Prompt Generator</title>
+    <title>GenArt Odai Maker</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome for Twitter icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Generative Art Prompt Generator</h1>
+    <main class="page-shell">
+        <div class="ambient ambient-left"></div>
+        <div class="ambient ambient-right"></div>
 
-        <div class="app-intro">
-        <p class="lead">
-            ジェネラティブアート制作のための「色・言葉・制限時間」をランダムに作るお題メーカーです。
-        </p>
+        <div class="container">
+            <header class="hero-card">
+                <p class="eyebrow">MAHOO LAB Creative Tool</p>
+                <h1>GenArt Odai Maker</h1>
+                <p class="hero-copy">色・言葉・制限時間をランダムに組み合わせて、次のジェネラティブアート制作のきっかけを作る小さなお題メーカーです。</p>
 
-        <ol class="how-to-use">
-            <li>Step1.「生成」ボタンでお題を作る</li>
-            <li>Step2. 色やテーマワードを見ながら作品を作る</li>
-            <li>Step3. できたお題をコピーしたり、Xでシェアする</li>
-        </ol>
-        </div>
-        <div class="action-buttons">
-            <button id="generateAll">生成</button>
-        </div>
-        <div class="prompt-container">
-            <div class="section">
-                <h2>カラーパレット</h2>
-                <div class="color-palette" id="colorPalette">
-                    <div class="color-box" id="color1"></div>
-                    <div class="color-box" id="color2"></div>
-                    <div class="color-box" id="color3"></div>
-                    <div class="color-box" id="color4"></div>
-                    <div class="color-box" id="color5"></div>
+                <ol class="how-to-use">
+                    <li>Generateでお題を作る</li>
+                    <li>色・言葉・時間・制約をヒントに制作する</li>
+                    <li>お題をコピーしたりXでシェアする</li>
+                </ol>
+
+                <div class="action-buttons hero-actions">
+                    <button id="generateAll" class="primary-button">Generate Mission</button>
                 </div>
-                <div class="color-codes" id="colorCodes"></div>
-                <button id="generateColors">新しいパレット</button>
-            </div>
-            
-            <div class="section">
-                <h2>テーマワード</h2>
-                <div class="theme-words" id="themeWords">
-                    <div class="word-box">ワード 1</div>
-                    <div class="word-box">ワード 2</div>
-                    <div class="word-box">ワード 3</div>
+            </header>
+
+            <section class="prompt-container" aria-label="Prompt generator controls">
+                <div class="section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">Palette</p>
+                            <h2>カラーパレット</h2>
+                        </div>
+                        <button id="generateColors">新しいパレット</button>
+                    </div>
+                    <div class="color-palette" id="colorPalette">
+                        <div class="color-box" id="color1"></div>
+                        <div class="color-box" id="color2"></div>
+                        <div class="color-box" id="color3"></div>
+                        <div class="color-box" id="color4"></div>
+                        <div class="color-box" id="color5"></div>
+                    </div>
+                    <div class="color-codes" id="colorCodes"></div>
                 </div>
-                <button id="generateWords">新しいワード</button>
-            </div>
-            
-            <div class="section">
-                <h2>制限時間</h2>
-                <div class="time-selector">
-                    <input type="number" id="hours" min="0" max="24" value="1">
-                    <label for="hours">時間</label>
-                    <input type="number" id="minutes" min="0" max="59" value="0">
-                    <label for="minutes">分</label>
-                    <button id="randomTime" class="small-button">ランダム</button>
+
+                <div class="section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">Words</p>
+                            <h2>テーマワード</h2>
+                        </div>
+                        <button id="generateWords">新しいワード</button>
+                    </div>
+                    <div class="theme-words" id="themeWords">
+                        <div class="word-box">ワード 1</div>
+                        <div class="word-box">ワード 2</div>
+                        <div class="word-box">ワード 3</div>
+                    </div>
                 </div>
+
+                <div class="section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">Time</p>
+                            <h2>制限時間</h2>
+                        </div>
+                        <button id="randomTime" class="small-button">ランダム</button>
+                    </div>
+                    <div class="time-selector">
+                        <div class="time-field">
+                            <input type="number" id="hours" min="0" max="24" value="1">
+                            <label for="hours">時間</label>
+                        </div>
+                        <div class="time-field">
+                            <input type="number" id="minutes" min="0" max="59" value="0">
+                            <label for="minutes">分</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">Constraint</p>
+                            <h2>制約</h2>
+                        </div>
+                        <button id="generateConstraint">新しい制約</button>
+                    </div>
+                    <div class="constraint-box" id="constraintValue">制約を生成中...</div>
+                </div>
+            </section>
+
+            <section class="prompt-result" id="promptResult">
+                <div class="result-header">
+                    <div>
+                        <p class="section-label">Mission</p>
+                        <h3>生成されたプロンプト</h3>
+                    </div>
+                    <p class="seed-display" id="seedDisplay">Seed: --</p>
+                </div>
+                <p id="finalPrompt"></p>
+            </section>
+
+            <div class="action-buttons bottom-actions">
+                <button id="copyPrompt">プロンプトをコピー</button>
+                <button id="tweetPrompt" class="twitter-button"><i class="fab fa-twitter"></i> Xでシェア</button>
             </div>
         </div>
-        
-        <div class="action-buttons">
-            <button id="copyPrompt">プロンプトをコピー</button>
-            <button id="tweetPrompt" class="twitter-button"><i class="fab fa-twitter"></i> Xでシェア</button>
-        </div>
-        
-        <div class="prompt-result" id="promptResult">
-            <h3>生成されたプロンプト</h3>
-            <p id="finalPrompt"></p>
-        </div>
-    </div>
+    </main>
+
     <footer>
         <p>© MAHOO LAB</p>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
