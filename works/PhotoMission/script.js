@@ -23,44 +23,14 @@ function setLoadingState(isLoading) {
   shareMissionBtn.disabled = isLoading;
 }
 
-function getMissionUrl(mission) {
-  const url = new URL(window.location.href);
-
-  if (mission?.id) {
-    url.searchParams.set("id", mission.id);
-  } else {
-    url.searchParams.delete("id");
-  }
-
-  return url.toString();
-}
-
-function syncMissionUrl(mission) {
-  window.history.replaceState({}, "", getMissionUrl(mission));
-}
-
-function findMissionById(id) {
-  return missions.find((mission) => mission.id === id) || null;
-}
-
-function getRequestedMissionId() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id");
-}
-
-function setCurrentMission(mission) {
-  currentMission = mission;
-  renderMission(currentMission);
-  syncMissionUrl(currentMission);
-}
-
 function pickMission() {
   if (missions.length === 0) {
     return;
   }
 
   const index = Math.floor(Math.random() * missions.length);
-  setCurrentMission(missions[index]);
+  currentMission = missions[index];
+  renderMission(currentMission);
 }
 
 function getShareText() {
@@ -68,7 +38,7 @@ function getShareText() {
     return "PHOTO MISSION\n\nお題を読み込み中です。";
   }
 
-  return `PHOTO MISSION\n\n${currentMission.text}\n\nいつもの景色を、違う見方で。\n#PhotoMission #MAHOLAB`;
+  return `PHOTO MISSION\n\n${currentMission.text}\n\nいつもの景色を、違う見方で。\n#PhotoMission`;
 }
 
 async function copyMission() {
@@ -87,7 +57,7 @@ async function copyMission() {
 
 function shareMission() {
   const text = encodeURIComponent(getShareText());
-  const url = encodeURIComponent(getMissionUrl(currentMission));
+  const url = encodeURIComponent(location.href);
   window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
 }
 
@@ -106,15 +76,7 @@ async function loadMissions() {
     }
 
     missions = data;
-
-    const requestedId = getRequestedMissionId();
-    const requestedMission = requestedId ? findMissionById(requestedId) : null;
-
-    if (requestedMission) {
-      setCurrentMission(requestedMission);
-    } else {
-      pickMission();
-    }
+    pickMission();
   } catch (error) {
     console.error(error);
     categoryEl.textContent = "ERROR";

@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MAHOO LAB | Creative Experiments</title>
+  <meta
+    name="description"
+    content="MAHOOのポートフォリオ。Webアプリ、Creative Coding、インタラクティブアート、イラストなどを制作しています。"
+  />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -119,6 +124,83 @@
       </div>
     </section>
 
+
+
+    <section id="creative-coding" class="section gallery-section" hidden>
+      <div class="section-title">
+        <h2>Creative Coding</h2>
+        <p>OpenProcessingの最新スケッチ</p>
+      </div>
+
+      <div
+        class="gallery-grid"
+        data-gallery-container
+        data-gallery-type="openprocessing"
+        aria-label="OpenProcessing works"
+      ></div>
+
+      <div class="gallery-link-row">
+        <a
+          class="gallery-link"
+          href="https://openprocessing.org/@u265449#sketches"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View all on OpenProcessing <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="illustration" class="section gallery-section" hidden>
+      <div class="section-title">
+        <h2>Illustration</h2>
+        <p>Instagramに投稿した最新イラスト</p>
+      </div>
+
+      <div
+        class="gallery-grid illustration-grid"
+        data-gallery-container
+        data-gallery-type="illustration"
+        aria-label="Instagram illustrations"
+      ></div>
+
+      <div class="gallery-link-row">
+        <a
+          class="gallery-link"
+          href="https://www.instagram.com/_ma_ring_drawing_/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View all on Instagram <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+    
+    <section id="protopedia" class="section gallery-section" hidden>
+      <div class="section-title">
+        <h2>Collaborative Prototypes</h2>
+        <p>Projects created as the creative unit "yohaku".</p>
+      </div>
+
+      <div
+        class="gallery-grid protopedia-grid"
+        data-protopedia-container
+        aria-label="Collaborative ProtoPedia works"
+      ></div>
+
+      <div class="gallery-link-row">
+        <a
+          class="gallery-link"
+          href="#"
+          data-protopedia-link
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View all on ProtoPedia <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
     <section id="about" class="about section">
       <div>
         <h2>About</h2>
@@ -135,12 +217,13 @@
     </section>
 
     <section id="links" class="links section">
-      <a href="https://x.com/__ma_ring__">Tweet <span>→</span></a>
+      <a href="https://x.com/__ma_ring__">X <span>→</span></a>
       <a href="https://www.instagram.com/_ma_ring_drawing_/">Illustration <span>→</span></a>
       <a href="https://openprocessing.org/@u265449#sketches">Creative Coding <span>→</span></a>
       <a href="#">Experiments <span>→</span></a>
       <a href="https://github.com/ma-ring" target="_blank" rel="noreferrer">GitHub <span>→</span></a>
     </section>
+
   </main>
 
   <footer class="footer">
@@ -148,6 +231,7 @@
     <p>Made with curiosity.</p>
   </footer>
 
+  <script src="config.js?v=20260713"></script>
   <script src="js/script.js"></script>
 </body>
 </html>

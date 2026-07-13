@@ -1,6 +1,12 @@
 const canvas = document.getElementById("bgCanvas");
 const ctx = canvas.getContext("2d");
 
+const OPENPROCESSING_PROFILE_URL = "https://openprocessing.org/@u265449#sketches";
+const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/_ma_ring_drawing_/";
+const GALLERY_LIMIT = 5;
+const protopediaRuntimeConfig = window.PROTOPEDIA_CONFIG || {};
+const PROTOPEDIA_PROFILE_URL = protopediaRuntimeConfig.PROTOPEDIA_PROFILE_URL || "https://protopedia.net/prototyper/yohaku_make";
+
 let width;
 let height;
 let particles = [];
@@ -102,3 +108,196 @@ window.addEventListener("resize", resize);
 
 resize();
 requestAnimationFrame(animate);
+
+async function loadGallerySection({
+  sectionSelector,
+  containerSelector,
+  jsonUrl,
+  limit = GALLERY_LIMIT,
+  fallbackAlt,
+  showTitle = true,
+  cardLabel = "OpenProcessing"
+}) {
+  const section = document.querySelector(sectionSelector);
+  const container = document.querySelector(containerSelector);
+
+  if (!section || !container) {
+    return;
+  }
+
+  try {
+    const response = await fetch(jsonUrl, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Failed to load ${jsonUrl}: ${response.status}`);
+    }
+
+    const items = await response.json();
+    const normalizedItems = normalizeGalleryItems(items).slice(0, limit);
+
+    if (normalizedItems.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    normalizedItems.forEach((item) => {
+      fragment.appendChild(createGalleryCard({ item, fallbackAlt, showTitle, cardLabel }));
+    });
+
+    container.replaceChildren(fragment);
+    section.hidden = false;
+  } catch (error) {
+    console.error(error);
+    section.hidden = true;
+  }
+}
+
+function normalizeGalleryItems(items) {
+  const sourceItems = Array.isArray(items)
+    ? items
+    : Array.isArray(items?.items)
+      ? items.items
+      : [];
+
+  return sourceItems
+    .filter((item) => item && typeof item === "object")
+    .map((item) => {
+      const normalizedUrl = typeof item.url === "string" ? item.url.trim() : "";
+      const normalizedThumbnail = typeof item.thumbnail === "string" ? item.thumbnail.trim() : "";
+      const normalizedThumbnailUrl = normalizeThumbnailUrl(normalizedThumbnail);
+      const normalizedTitle = typeof item.title === "string" ? item.title.trim() : "";
+      const normalizedDescription = typeof item.description === "string" ? item.description.trim() : "";
+      const normalizedDate = typeof item.date === "string" ? item.date.trim() : "";
+
+      return {
+        ...item,
+        url: normalizedUrl,
+        thumbnail: normalizedThumbnailUrl,
+        title: normalizedTitle,
+        description: normalizedDescription,
+        date: normalizedDate
+      };
+    })
+    .filter((item) => item.url && (item.thumbnail || item.image))
+    .map((item) => ({
+      ...item,
+      thumbnail: item.thumbnail || item.image || ""
+    }));
+}
+
+function normalizeThumbnailUrl(thumbnail) {
+  if (!thumbnail) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(thumbnail)) {
+    return thumbnail;
+  }
+
+  if (thumbnail.startsWith("./")) {
+    return thumbnail.replace(/^\.\//, "");
+  }
+
+  return thumbnail;
+}
+
+function createGalleryCard({ item, fallbackAlt, showTitle, cardLabel }) {
+  const card = document.createElement("a");
+  card.className = `gallery-card${showTitle ? "" : " image-only"}`;
+  card.href = item.url;
+  card.target = "_blank";
+  card.rel = "noopener noreferrer";
+
+  const itemTitle = typeof item.title === "string" && item.title.trim() ? item.title.trim() : "";
+  const imageAlt = itemTitle || fallbackAlt;
+  const screenReaderLabel = itemTitle
+    ? `${itemTitle} を外部サイトで開く`
+    : `${fallbackAlt} を外部サイトで開く`;
+
+  card.setAttribute("aria-label", screenReaderLabel);
+
+  const thumb = document.createElement("div");
+  thumb.className = "gallery-thumb";
+
+  const image = document.createElement("img");
+  image.src = item.thumbnail;
+  image.alt = imageAlt;
+  image.loading = "lazy";
+
+  thumb.appendChild(image);
+  card.appendChild(thumb);
+
+  if (showTitle) {
+    const body = document.createElement("div");
+    body.className = "gallery-body";
+
+    const label = document.createElement("p");
+    label.className = "gallery-label";
+    label.textContent = cardLabel;
+
+    const title = document.createElement("h3");
+    title.className = "gallery-title";
+    title.textContent = itemTitle || fallbackAlt;
+
+    body.append(label, title);
+
+    if (typeof item.description === "string" && item.description.trim()) {
+      const description = document.createElement("p");
+      description.className = "gallery-description";
+      description.textContent = item.description;
+      body.appendChild(description);
+    }
+
+    if (typeof item.date === "string" && item.date.trim()) {
+      const date = document.createElement("p");
+      date.className = "gallery-date";
+      date.textContent = item.date;
+      body.appendChild(date);
+    }
+
+    card.appendChild(body);
+  }
+
+  return card;
+}
+
+document.querySelectorAll('[href="https://openprocessing.org/@u265449#sketches"]').forEach((link) => {
+  link.href = OPENPROCESSING_PROFILE_URL;
+});
+
+document.querySelectorAll('[href="https://www.instagram.com/_ma_ring_drawing_/"]').forEach((link) => {
+  link.href = INSTAGRAM_PROFILE_URL;
+});
+
+document.querySelectorAll('[data-protopedia-link]').forEach((link) => {
+  link.href = PROTOPEDIA_PROFILE_URL;
+});
+
+loadGallerySection({
+  sectionSelector: "#creative-coding",
+  containerSelector: "#creative-coding [data-gallery-container]",
+  jsonUrl: "data/openprocessing.json",
+  fallbackAlt: "Creative coding work"
+});
+
+
+loadGallerySection({
+  sectionSelector: "#illustration",
+  containerSelector: "#illustration [data-gallery-container]",
+  jsonUrl: "data/illustrations.json",
+  fallbackAlt: "Illustration",
+  showTitle: true,
+  cardLabel:"Instagram"
+});
+
+
+
+loadGallerySection({
+  sectionSelector: "#protopedia",
+  containerSelector: "#protopedia [data-protopedia-container]",
+  jsonUrl: "data/protopedia.json",
+  fallbackAlt: "Collaborative prototype",
+  cardLabel: "Collaborative work / yohaku",
+});

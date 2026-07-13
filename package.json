@@ -1,0 +1,11 @@
+{
+  "name": "ma-ring-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update:protopedia": "node scripts/update-protopedia.mjs"
+  },
+  "dependencies": {
+    "protopedia-api-v2-client": "^3.0.0"
+  }
+}
