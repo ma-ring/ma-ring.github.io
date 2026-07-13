@@ -6,8 +6,8 @@ const require = createRequire(import.meta.url);
 const { PROTOPEDIA_PROFILE_URL } = require("../config.js");
 
 const OUTPUT_PATH = path.join(process.cwd(), "data", "protopedia.json");
-const MAX_ITEMS = 20;
-const TOKEN = process.env.PROTOPEDIA_API_V2_TOKEN;
+const MAX_ITEMS = 5;
+const TOKEN = "8c6382274c0c828a5a51e6d3cca5860e";//process.env.PROTOPEDIA_API_V2_TOKEN;
 const API_URL = process.env.PROTOPEDIA_API_URL || "https://protopedia.net/v2/api/";
 
 async function main() {
@@ -57,7 +57,7 @@ async function main() {
 
 async function loadPayload(token) {
   try {
-    const client = createClient(token);
+    const client = await createClient(token);
     if (client && typeof client.listPrototypes === "function") {
       return await client.listPrototypes({
         userNm: "yohaku_make",
@@ -72,9 +72,13 @@ async function loadPayload(token) {
   return loadPayloadViaRest(token);
 }
 
-function createClient(token) {
+async function createClient(token) {
   try {
-    const { createProtoPediaClient } = require("protopedia-api-v2-client");
+    const module = await import("protopedia-api-v2-client");
+    const createProtoPediaClient = module.createProtoPediaClient ?? module.default?.createProtoPediaClient;
+    if (typeof createProtoPediaClient !== "function") {
+      throw new Error("createProtoPediaClient is not exported.");
+    }
     return createProtoPediaClient({ token });
   } catch (error) {
     throw new Error(`Unable to load protopedia-api-v2-client: ${error.message}`);
@@ -105,6 +109,7 @@ async function loadPayloadViaRest(token) {
       }
 
       const payload = await response.json();
+      console.log("ProtoPedia REST payload sample:", JSON.stringify(payload).slice(0, 1200));
       if (isPayloadUsable(payload)) {
         return payload;
       }
@@ -125,9 +130,13 @@ function isPayloadUsable(payload) {
 function normalizeItems(payload) {
   const candidates = Array.isArray(payload)
     ? payload
-    : Array.isArray(payload?.items)
-      ? payload.items
-      : [];
+    : Array.isArray(payload?.results)
+      ? payload.results
+      : Array.isArray(payload?.items)
+        ? payload.items
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
 
   return candidates
     .filter((item) => item && typeof item === "object")
@@ -135,7 +144,7 @@ function normalizeItems(payload) {
       id: String(item.id ?? item.prototypeId ?? item.prototype_id ?? ""),
       title: sanitizeText(item.prototypeNm ?? item.title ?? item.name ?? ""),
       description: sanitizeText(item.summary ?? item.description ?? item.abstract ?? ""),
-      url: normalizeUrl(item.prototypeUrl ?? item.url ?? item.mainUrl ?? item.main_url ?? item.link ?? ""),
+      url: normalizePrototypeUrl(item.id ?? item.prototypeId ?? item.prototype_id ?? ""),
       thumbnail: normalizeThumbnail(item.mainUrl ?? item.thumbnail ?? item.image ?? item.cover ?? item.imageUrl ?? item.image_url ?? ""),
       status: item.status ?? item.statusCode ?? null,
       releaseDate: sanitizeText(item.releaseDate ?? item.release_date ?? item.releasedAt ?? item.released_at ?? ""),
@@ -148,7 +157,7 @@ function normalizeItems(payload) {
       credit: sanitizeText(item.credit ?? item.teamNm ?? item.team ?? "Collaborative work / yohaku")
     }))
     .filter((item) => item.title && item.url)
-    .sort((a, b) => compareDates(b.releaseDate || b.updatedAt || b.createdAt, a.releaseDate || a.updatedAt || a.createdAt));
+    .sort((a, b) => compareDates(normalizeDateValue(a.releaseDate || a.updatedAt || a.createdAt), normalizeDateValue(b.releaseDate || b.updatedAt || b.createdAt)));
 }
 
 function sanitizeText(value) {
@@ -183,22 +192,13 @@ function normalizeStringArray(value) {
   return [];
 }
 
-function normalizeUrl(value) {
-  if (typeof value !== "string" || !value.trim()) {
+function normalizePrototypeUrl(id) {
+  if (typeof id !== "string" && typeof id !== "number") {
     return "";
   }
 
-  const trimmed = value.trim();
-
-  if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
-  }
-
-  if (trimmed.startsWith("/")) {
-    return new URL(trimmed, PROTOPEDIA_PROFILE_URL).toString();
-  }
-
-  return trimmed.includes("prototype") ? `https://protopedia.net/prototype/${trimmed}` : "";
+  const normalizedId = String(id).trim();
+  return normalizedId ? `https://protopedia.net/prototype/${normalizedId}` : "";
 }
 
 function normalizeThumbnail(value) {
@@ -216,14 +216,22 @@ function normalizeThumbnail(value) {
 }
 
 function compareDates(a, b) {
-  const aTime = Date.parse(a);
-  const bTime = Date.parse(b);
+  const aTime = Date.parse(normalizeDateValue(a));
+  const bTime = Date.parse(normalizeDateValue(b));
 
   if (Number.isNaN(aTime) || Number.isNaN(bTime)) {
     return 0;
   }
 
   return bTime - aTime;
+}
+
+function normalizeDateValue(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim().replace(/\s+/g, " ");
 }
 
 async function readIfExists(filePath) {

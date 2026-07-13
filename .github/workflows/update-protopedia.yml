@@ -24,7 +24,9 @@ jobs:
       - name: Update ProtoPedia data
         env:
           PROTOPEDIA_API_V2_TOKEN: ${{ secrets.PROTOPEDIA_API_V2_TOKEN }}
-        run: node scripts/update-protopedia.mjs
+        run: |
+          echo "PROTOPEDIA_API_V2_TOKEN is set: ${PROTOPEDIA_API_V2_TOKEN:+yes}"
+          node scripts/update-protopedia.mjs
 
       - name: Commit updated JSON
         run: |
