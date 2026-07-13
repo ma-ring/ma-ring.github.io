@@ -8,23 +8,28 @@ const { PROTOPEDIA_PROFILE_URL } = require("../config.js");
 const OUTPUT_PATH = path.join(process.cwd(), "data", "protopedia.json");
 const MAX_ITEMS = 20;
 const TOKEN = process.env.PROTOPEDIA_API_V2_TOKEN;
+const API_URL = process.env.PROTOPEDIA_API_URL || "https://protopedia.net/v2/api/";
 
 async function main() {
   if (!TOKEN) {
-    throw new Error("PROTOPEDIA_API_V2_TOKEN is not set.");
+    console.warn("PROTOPEDIA_API_V2_TOKEN is not set; skipping ProtoPedia update.");
+    return;
   }
 
-  const client = createClient(TOKEN);
-  const payload = await client.listPrototypes({
-    userNm: "yohaku_make",
-    limit: 20,
-    offset: 0
-  });
+  let payload;
+
+  try {
+    payload = await loadPayload(TOKEN);
+  } catch (error) {
+    console.warn(`ProtoPedia update skipped: ${error.message}`);
+    return;
+  }
 
   const items = normalizeItems(payload).slice(0, MAX_ITEMS);
 
   if (!Array.isArray(items) || items.length === 0) {
-    throw new Error("No ProtoPedia items were returned.");
+    console.warn("No ProtoPedia items were returned; keeping existing JSON.");
+    return;
   }
 
   const nextJson = JSON.stringify(
@@ -50,6 +55,23 @@ async function main() {
   console.log(`Updated ${OUTPUT_PATH} with ${items.length} items.`);
 }
 
+async function loadPayload(token) {
+  try {
+    const client = createClient(token);
+    if (client && typeof client.listPrototypes === "function") {
+      return await client.listPrototypes({
+        userNm: "yohaku_make",
+        limit: 20,
+        offset: 0
+      });
+    }
+  } catch (error) {
+    console.warn(`ProtoPedia client unavailable, falling back to REST fetch: ${error.message}`);
+  }
+
+  return loadPayloadViaRest(token);
+}
+
 function createClient(token) {
   try {
     const { createProtoPediaClient } = require("protopedia-api-v2-client");
@@ -57,6 +79,47 @@ function createClient(token) {
   } catch (error) {
     throw new Error(`Unable to load protopedia-api-v2-client: ${error.message}`);
   }
+}
+
+async function loadPayloadViaRest(token) {
+  const urls = [
+    `${API_URL.replace(/\/$/, "")}/prototypes?userNm=yohaku_make&limit=20&offset=0`,
+    `${API_URL.replace(/\/$/, "")}?userNm=yohaku_make&limit=20&offset=0`,
+    API_URL
+  ];
+
+  let lastError;
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        lastError = new Error(`REST request failed with ${response.status}`);
+        continue;
+      }
+
+      const payload = await response.json();
+      if (isPayloadUsable(payload)) {
+        return payload;
+      }
+
+      lastError = new Error("REST response did not contain usable ProtoPedia data.");
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("Unable to load ProtoPedia data from the API.");
+}
+
+function isPayloadUsable(payload) {
+  return Array.isArray(payload) || Array.isArray(payload?.items) || Array.isArray(payload?.data);
 }
 
 function normalizeItems(payload) {
